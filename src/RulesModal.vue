@@ -3,21 +3,17 @@ import { watchEffect } from 'vue'
 import BaseButton from './BaseButton.vue'
 import { DURATION } from './utils.js'
 
-const props = defineProps({
-  visible: {
-    required: true,
-    type: Boolean
-  }
+const visible = defineModel('visible', {
+  required: true,
+  type: Boolean
 })
 
-const emit = defineEmits(['update:visible'])
-
 watchEffect(() => {
-  document.body.style.overflow = props.visible ? 'hidden' : ''
+  document.body.style.overflow = visible.value ? 'hidden' : ''
 })
 
 function close() {
-  emit('update:visible', false)
+  visible.value = false
 }
 </script>
 

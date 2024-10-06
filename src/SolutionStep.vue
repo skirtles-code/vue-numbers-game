@@ -8,21 +8,20 @@ const props = defineProps({
   stillRemaining: {
     required: true,
     type: Array
-  },
-  step: {
-    required: true,
-    type: Array
   }
 })
 
-const emit = defineEmits(['update:step'])
+const step = defineModel('step', {
+  required: true,
+  type: Array
+})
 
 const firstNumIndex = ref(null)
 const secondNumIndex = ref(null)
 
-const firstNum = computed(() => props.step[0])
-const selectedOp = computed(() => props.step[1])
-const secondNum = computed(() => props.step[2])
+const firstNum = computed(() => step.value[0])
+const selectedOp = computed(() => step.value[1])
+const secondNum = computed(() => step.value[2])
 
 const getIndexedNumberList = () => {
   return props.stillRemaining.map((value, index) => ({
@@ -104,12 +103,12 @@ watchEffect(() => {
   }
 })
 
-function updateStep(...step) {
-  while (step.length && step[step.length - 1] == null) {
-    step.pop()
+function updateStep(...newStep) {
+  while (newStep.length && newStep[newStep.length - 1] == null) {
+    newStep.pop()
   }
 
-  emit('update:step', step)
+  step.value = newStep
 }
 
 function onFirstClick(index) {
