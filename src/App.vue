@@ -18,12 +18,14 @@ const nextStep = ref('')
 const steps = reactive([])
 const showRules = ref(false)
 const hintIndex = ref(0)
+const ready = ref(false)
+let readyTimer = null
 
 startNewGame()
 
 const isCompleteStep = (step) => step.length === 3 && step.every(value => value)
 
-const solution = computed(() => solve(startNumbers, target))
+const solution = computed(() => ready.value ? solve(startNumbers, target) : [target.value])
 const stillRemaining = computed(() => numbersRemaining(startNumbers, steps.filter(isCompleteStep)))
 const closestDistance = computed(() => distance(solution.value[0], target))
 const targetReached = computed(() => stillRemaining.value.some(num => distance(num, target) === closestDistance.value))
@@ -157,6 +159,7 @@ function pickOne(arr) {
 function startNewGame() {
   reset()
   hintIndex.value = 0
+  ready.value = false
 
   const nums = []
 
@@ -180,6 +183,12 @@ function startNewGame() {
   startNumbers.value = nums
 
   target.value = Math.floor(Math.random() * 900 + 100)
+
+  clearTimeout(readyTimer)
+
+  readyTimer = setTimeout(() => {
+    ready.value = true
+  }, DURATION * 1.25)
 }
 
 function reset() {
@@ -263,7 +272,7 @@ function showHint() {
     </BaseCard>
     <BaseCard>
       <div class="bottom-button-bar">
-        <BaseButton :disabled="hintIndex === allHints.length" @click="showHint">
+        <BaseButton :disabled="!ready || hintIndex === allHints.length" @click="showHint">
           Show hint
         </BaseButton>
         <BaseButton @click="showRules = true">
